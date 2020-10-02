@@ -3,9 +3,11 @@
 <head>
   <meta charset="UTF-8">
   <title>Main</title>
-  <style>body { padding: 20; margin: 20; }</style>
+  <style>
+    textarea { font-size: 14pt }
+    body { padding: 20; margin: 20; font-size: 20pt; }
+  </style>
 </head>
-
 <body>
 
 <pre id="elm"></pre>
@@ -4369,7 +4371,7 @@ function _Browser_load(url)
 		}
 	}));
 }
-var $author$project$Main$init = {content: 'Паша пицца 100\nМаша суши,колу 60\nИван жвачка 5'};
+var $author$project$Main$init = {content: 'Паша пицца 100\nМаша суши колу 60\nИван жвачка 5'};
 var $elm$core$Basics$EQ = {$: 'EQ'};
 var $elm$core$Basics$GT = {$: 'GT'};
 var $elm$core$Basics$LT = {$: 'LT'};
@@ -5392,6 +5394,20 @@ var $author$project$Main$peopleUniqNames = function (text) {
 var $elm$core$List$sum = function (numbers) {
 	return A3($elm$core$List$foldl, $elm$core$Basics$add, 0, numbers);
 };
+var $author$project$Main$takeSumFronLine = function (string) {
+	var clearedString = A2(
+		$elm$core$List$filter,
+		function (word) {
+			return word !== '';
+		},
+		A2($elm$core$String$split, ' ', string));
+	var num = $elm$core$List$length(clearedString);
+	return A2(
+		$elm$core$Maybe$withDefault,
+		'',
+		$elm$core$List$head(
+			A2($elm$core$List$drop, num - 1, clearedString)));
+};
 var $author$project$Main$sumPaymentsByName = F2(
 	function (text, name) {
 		return $elm$core$List$sum(
@@ -5405,7 +5421,7 @@ var $author$project$Main$sumPaymentsByName = F2(
 				},
 				A2(
 					$elm$core$List$map,
-					$author$project$Main$takeFromLine(3),
+					$author$project$Main$takeSumFronLine,
 					A2(
 						$elm$core$List$filter,
 						function (line) {
@@ -5427,6 +5443,12 @@ var $author$project$Main$allPayments = function (text) {
 		$elm$core$Set$toList(uniqNames));
 };
 var $elm$html$Html$br = _VirtualDom_node('br');
+var $elm$html$Html$Attributes$cols = function (n) {
+	return A2(
+		_VirtualDom_attribute,
+		'cols',
+		$elm$core$String$fromInt(n));
+};
 var $elm$html$Html$div = _VirtualDom_node('div');
 var $elm$core$List$intersperse = F2(
 	function (sep, xs) {
@@ -5540,7 +5562,7 @@ var $author$project$Main$totalValue = function (text) {
 			},
 			A2(
 				$elm$core$List$map,
-				$author$project$Main$takeFromLine(3),
+				$author$project$Main$takeSumFronLine,
 				$elm$core$String$lines(text))));
 };
 var $author$project$Main$perPersonValue = function (text) {
@@ -5612,7 +5634,7 @@ var $author$project$Main$view = function (model) {
 							function (_v2) {
 								var name = _v2.a;
 								var val = _v2.b;
-								return name + (' : ' + $elm$core$Debug$toString(perPerson - val));
+								return name + (' : ' + $elm$core$String$fromInt(perPerson - val));
 							}),
 						_List_fromArray(
 							[dolzhniki, nuzhdaushiesya]))))));
@@ -5635,7 +5657,8 @@ var $author$project$Main$view = function (model) {
 						$elm$html$Html$Attributes$placeholder('Лена такси 1000'),
 						$elm$html$Html$Attributes$value(model.content),
 						$elm$html$Html$Events$onInput($author$project$Main$Change),
-						$elm$html$Html$Attributes$rows(6)
+						$elm$html$Html$Attributes$rows(6),
+						$elm$html$Html$Attributes$cols(30)
 					]),
 				_List_Nil),
 				A2(

@@ -8,7 +8,7 @@ module Main exposing (..)
 
 import Browser
 import Html exposing (Html, Attribute, div, br, input, text, textarea, p)
-import Html.Attributes exposing (placeholder, value, rows)
+import Html.Attributes exposing (placeholder, value, cols, rows)
 import Html.Events exposing (onInput)
 import String exposing (join, lines, fromInt)
 import List exposing (intersperse, partition, length, take,sum, drop, map, concat, foldr, filter, head)
@@ -42,7 +42,7 @@ init : Model
 init =
   { content =
       """Паша пицца 100
-Маша суши,колу 60
+Маша суши колу 60
 Иван жвачка 5"""
   }
 
@@ -76,7 +76,7 @@ view model =
       allPayments model.content
       |> partition (\(name, val) -> perPerson - val > 0)
     saldos = [dolzhniki, nuzhdaushiesya]
-      |> map (map (\(name, val) -> name ++ " : " ++ (perPerson - val |> Debug.toString)))
+      |> map (map (\(name, val) -> name ++ " : " ++ (perPerson - val |> fromInt)))
       |> map (join ", ")
       |> intersperse " -> "
       |> join " "
@@ -94,6 +94,7 @@ view model =
         [ placeholder "Лена такси 1000"
         , value model.content, onInput Change
         , rows 6
+        , cols 30
         ] []
       , div [] [ text <| "нас было : " ++ numOfPeople ]
       , div [] [ text <| "прокутили : " ++ sum ]
@@ -116,11 +117,25 @@ takeFromLine num string =
    |> head
    |> withDefault ""
 
+takeSumFronLine : String -> String
+takeSumFronLine string =
+  let
+    clearedString =
+      string
+      |> String.split " "
+      |> filter (\word -> word /= "")
+    num = clearedString |> List.length
+  in
+  clearedString
+   |> drop (num - 1)
+   |> head
+   |> withDefault ""
+
 totalValue : InputText -> Int
 totalValue text =
   text
    |> lines
-   |> map (takeFromLine 3)
+   |> map takeSumFronLine
    |> map (\num -> withDefault 0 <| String.toInt num)
    |> sum
 
@@ -140,20 +155,13 @@ peopleUniqNames text =
  |> filter (\word -> word /= "")
  |> Set.fromList
 
-peopleUniqPlaces : InputText -> Set String
-peopleUniqPlaces text =
-  text
- |> lines
- |> map (takeFromLine 2)
- |> filter (\word -> word /= "")
- |> Set.fromList
 
 sumPaymentsByName : InputText -> String -> Int
 sumPaymentsByName text name =
  text
  |> lines
  |> filter (\line -> takeFromLine 1 line == name)
- |> map (takeFromLine 3)
+ |> map takeSumFronLine
  |> map (\num -> withDefault 0 <| String.toInt num)
  |> sum
 
